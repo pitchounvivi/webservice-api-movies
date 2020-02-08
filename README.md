@@ -1,8 +1,7 @@
 # Webservice API Movies
 Student project
 
-
-
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/1e97c44efb034d79a4d25896994429ea)](https://www.codacy.com/manual/pitchounvivi/webservice-api-movies?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=pitchounvivi/webservice-api-movies&amp;utm_campaign=Badge_Grade)
 
 ## Usage
 config.js

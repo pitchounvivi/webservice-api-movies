@@ -1,0 +1,230 @@
+<% include ./partials/header.ejs %>
+
+<p>Il faut un commencement, à tout :</p>
+
+<div class="container-fluid">
+
+    <div class="row justify-content-around" id="dudule">
+
+        <!--pour afficher les préférences de film-->
+        <%- JSON.stringify(likes) %>
+        <% for(like of likes){ %>
+        <%= like %>
+        <%}%>
+        <!--fin-->
+
+        <% for(data of datas){ %>
+
+        <div class="card" style="width: 18rem; margin-bottom: 10px; margin-top: 10px">
+            <img src="/img/le-hobbit-la-bataille-des-cinq-armees-5b912bca64af1.jpg" class="card-img-top" alt="...">
+            <div class="card-body">
+                <h5 class="card-title"><%= data.title %></h5>
+                <p class="card-text">(<%= data.year %>)</p>
+                <p class="card-text"><%= data.description %></p><br />
+                <p class="card-text">Note du film : <%= data.rank %></p><br />
+                <p class="card-text">Catégorie : <%= data.category %></p><br />
+                <a href="/movies/<%= data._id%>" class="btn btn-primary">Découvrir le film</a>
+                <br>
+                <a href="#" id='<%=data._id%>' name="like" class="like btn btn-success mt-2">Like</a>
+                <a href="#" id='<%=data._id%>' name="dislike" class="dislike btn btn-danger mt-2">Dislike</a>
+
+            </div>
+        </div>
+
+        <% } %>
+
+    </div>
+
+
+
+    <div class="container">
+        <h2>Ajouter un film :</h2>
+
+        <form action="/movies" method="post" class="form-group">
+            <label for="titre">Titre : </label>
+            <input type="text" name="titre" id="titre" class="form-control">
+
+            <label for="annee">Année : </label>
+            <input type="number" name="annee" id="annee" class="form-control">
+
+            <label for="description">Description : </label>
+            <input type="text" name="description" id="description" class="form-control">
+
+            <label for="note">Note : </label>
+            <input type="number" name="note" id="note" class="form-control">
+
+            <label for="categorie">Catégorie : </label>
+            <input type="text" name="categorie" id="categorie" class="form-control">
+
+            <input type="submit" value="envoyer" class="btn btn-primary mt-2">
+
+        </form>
+
+    </div>
+
+
+
+</div>
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<!-- axios permet de faire des requêtes plus courtes que xhr et de ne recharger qu'une partie de la page-->
+
+
+<script>
+
+    const form = document.querySelector('form'); //pour récupérer formulaire
+    //console.log(form);
+
+    form.addEventListener('submit', addMovie); //à l'aide de l'event listener on ajoute un évènement qu'on lie à une fonction
+
+    function addMovie(event) { //event fait référence à l'évènement submit
+        event.preventDefault();
+
+        if (fetch && form.titre.value !== '' && form.annee.value !== '') { //on vérifie que les champs ne sont pas vide avant d'ajouter
+            fetch('/movies', {
+                method: 'POST',
+                body: new FormData(form)
+            }).then(checkStatus).catch(function (error) {
+                console.log('erreur récupérée : ' + error);
+            })
+        }
+    }
+
+
+    function checkStatus(response) {
+        if (response.status >= 200 && response.status < 300) { //on vérifie que le status est ok
+            // on a plus qu'à ajouter le film
+            let divCard = document.createElement('div');
+            let imgCard = document.createElement('img');
+            let divBody = document.createElement('div');
+            let h5Card = document.createElement('h5');
+            let pCard = document.createElement('p');
+
+            let p1Card = document.createElement('p');
+            let p2Card = document.createElement('p');
+            let p3Card = document.createElement('p');
+            let aCard = document.createElement('a');
+
+
+
+
+            divCard.classList.add('card');
+            imgCard.classList.add('card-img-top');
+            divBody.classList.add('card-body');
+            h5Card.classList.add('card-title');
+            pCard.classList.add('card-text');
+            p1Card.classList.add('card-text');
+            p2Card.classList.add('card-text');
+            p3Card.classList.add('card-text');
+            aCard.classList.add('btn', 'btn-primary');
+            aCard.setAttribute('href', "/movies/<%= data._id%>"); //pour activer le bouton
+
+
+
+            console.log(divCard, imgCard, divBody, h5Card, pCard, aCard);
+
+            const titre = document.getElementById('titre').value;
+            const year = document.getElementById('annee').value;
+            const description = document.getElementById('description').value;
+            const rank = document.getElementById('note').value;
+            const category = document.getElementById('categorie').value;
+
+
+            h5Card.innerHTML = `${titre}`;
+            pCard.innerHTML = `(${year})`;
+            p1Card.innerHTML = `${description}`;
+            p2Card.innerHTML = `Note du film : ${rank}`;
+            p3Card.innerHTML = `Catégorie : ${category}`;
+            aCard.innerText = 'Découvrir le film';
+
+            imgCard.setAttribute('src', "/img/le-hobbit-la-bataille-des-cinq-armees-5b912bca64af1.jpg");
+            divCard.style.width = "18rem";
+            divCard.style.marginTop = "10px";
+            divCard.style.marginBottom = "10px";
+
+
+            divBody.appendChild(h5Card);
+            divBody.appendChild(pCard);
+            divBody.appendChild(p1Card);
+            divBody.appendChild(p2Card);
+            divBody.appendChild(p3Card);
+            divBody.appendChild(aCard);
+
+            divCard.appendChild(imgCard);
+            divCard.appendChild(divBody);
+
+
+            document.getElementById('dudule').appendChild(divCard);
+
+            form.reset();
+
+        }
+
+
+    }
+
+
+    //on récupère le bouton like
+    const likes = document.querySelectorAll('.like');
+    for (const like of likes) {
+        //console.log(like.id);
+        //on ajoute l'évènement click sur le bouton
+        like.addEventListener('click', liked);
+
+    }
+
+
+
+
+    //on récupère le bouton dislike
+    const dislikes = document.querySelectorAll('.dislike');
+    for (const dislike of dislikes) {
+        //console.log(like.id);
+        //on ajoute l'évènement click sur le bouton
+        dislike.addEventListener('click', disliked);
+
+    }
+
+
+
+    //on crée les méthodes liked et disliked avec axios
+    function liked(event) {
+        const id = this.id;
+        console.log(id);
+
+        event.preventDefault();
+
+        axios.post(
+            `http://localhost:3000/like/${id}`
+        ).then(res => {
+            console.log('Success like');
+            console.log(res);
+        }).catch(err => {
+            console.error('err', err);
+        })
+
+    }
+
+    function disliked(event) {
+        const id = this.id;
+        console.log(id);
+
+        event.preventDefault();
+
+        axios.post(
+            `http://localhost:3000/dislike/${id}`
+        ).then(res => {
+            console.log('Success dislike');
+            console.log(res);
+        }).catch(err => {
+            console.error('err', err);
+        });
+
+    }
+
+
+
+</script>
+
+
+<% include ./partials/footer.ejs %>

@@ -1,0 +1,19 @@
+
+
+    <% include ./partials/header.ejs %>
+
+    <br><br>
+    <p> Pour info, vous êtes le <%= visited %> ème visiteurs du site</p>
+    <br><br>
+
+    <p>
+            <% for (user of users){%>
+                <%= user.name %>         
+                <%= user.surname %>,
+                <br>
+            <%}%>
+    </p>
+    <br><br>
+
+    <% include ./partials/footer.ejs %>
+

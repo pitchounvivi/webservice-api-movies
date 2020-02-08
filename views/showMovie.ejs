@@ -1,0 +1,73 @@
+
+
+    <% include ./partials/header.ejs %>
+
+    <div id="pageFilm" class="container-fluid">
+        <h1><%= movie.title %></h1>
+
+        <p>Il est sorti en : <%= movie.year %></p>
+        <p><%= movie.description %></p>
+        <p>Note du : <%= movie.rank %> / 10</p>
+
+        <p>l'id du film est : <%= movie._id %></p>
+    </div>
+
+    <div class="container">
+        <h2>Modifier :</h2>
+
+        <form action="/movies/<%= movie._id %>" method="post" class="form-group">
+            <label for="titre">Titre : </label>
+            <input type="text" name="titre" id="titre" class="form-control" value="<%= movie.title %>">
+
+            <label for="annee">Année : </label>
+            <input type="number" name="annee" id="annee" class="form-control" value="<%= movie.year %>">
+
+            <label for="description">Description : </label>
+            <input type="text" name="description" id="description" class="form-control"
+                value="<%= movie.description %>">
+
+            <label for="note">Note : </label>
+            <input type="number" name="note" id="note" class="form-control" value="<%= movie.rank %>">
+
+            <label for="categorie">Catégorie : </label>
+            <input type="text" name="categorie" id="categorie" class="form-control" value="<%= movie.category %>">
+
+            <input type="submit" value="Modifier" class="btn btn-primary mt-2 mb-2">
+
+        </form>
+
+        <a href="#" id="btnSuppr" class="btn btn-danger mt-2 mb-2">Supprimer</a> <!--bien mettre le # pour avoir la redirection vers le movies-->
+
+    </div>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script> <!-- gérer la redirection après la suppression -->
+    <script>
+
+        let btnSuppr = document.getElementById('btnSuppr');
+        btnSuppr.addEventListener('click', deleteDoc);
+
+        function deleteDoc() {
+            let movieId = `<%= movie._id %>`;
+            let url = `/movies/${movieId}`;
+
+            console.log(url);
+
+            // then et catch sont propre aux promesses de axios
+
+            axios.delete(url).then(function(response){
+                window.location ='/movies'
+            }).catch(function(error){
+                console.log(error);
+            })
+
+        }
+
+    </script>
+
+
+
+    <% include ./partials/footer.ejs %>
+
+</body>
+
+</html>

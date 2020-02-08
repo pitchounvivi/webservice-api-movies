@@ -1,0 +1,18 @@
+
+
+    <% include ./partials/header.ejs %>
+
+    <div class="container">
+
+        <h1>ici votre recherche</h1>
+
+        <form action="/search" method="post" class="form-group">
+            <label for="note">Rechercher par note : </label>
+            <input type="number" name="note" id="note" class="form-control">
+
+            <button type="submit" class="btn btn-primary mt-2">Rechercher</button>
+        </form>
+    
+    </div>
+
+    <% include ./partials/footer.ejs %>

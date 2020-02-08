@@ -1,0 +1,70 @@
+<hr>
+<p>Copyright &copy; 2019 Code Modern Concept</p>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+
+
+<script>
+
+    //pour écouter constamment la page web équivalent au $(document).ready()
+    (function (exports, d) {
+        function domReady(fn, context) {
+            function onReady(event) {
+                d.removeEventListener("DOMContentLoaded", onReady);
+                fn.call(context || exports, event);
+            }
+            function onReadyIe(event) {
+                if (d.readyState === "complete") {
+                    d.detachEvent("onreadystatechange", onReadyIe);
+                    fn.call(context || exports, event);
+                }
+            }
+            d.addEventListener && d.addEventListener("DOMContentLoaded", onReady) ||
+                d.attachEvent && d.attachEvent("onreadystatechange", onReadyIe);
+        }
+        exports.domReady = domReady;
+    })(window, document);
+
+    domReady(function () {
+        console.log("DOM is ready");
+
+        let connectionLinkArea = document.querySelector('#connectionLink');
+
+        testUsersStatus();
+
+        function testUsersStatus() {
+            if (localStorage.getItem('token')) {
+                displayLoggedInView();
+            } else {
+                displayLoggedOutView();
+            }
+        }
+        
+        function displayLoggedInView() {
+            connectionLinkArea.innerHTML = '<a class="nav-item nav-link" id="decoUrl" href="/login">Déconnexion</a>';
+            document.getElementById('decoUrl').addEventListener('click', disconnect);
+            switchToLogged();
+        }
+
+        function displayLoggedOutView() {
+            connectionLinkArea.innerHTML = '<a class="nav-item nav-link" href="/login">Connexion</a>';
+            switchToForm();
+        }
+
+
+
+    })
+
+</script>
+
+</body>
+
+</html>

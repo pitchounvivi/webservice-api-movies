@@ -1,0 +1,176 @@
+<% include ./partials/header.ejs %>
+
+<br><br><br>
+
+<h2>Se connecter</h2>
+
+<br>
+
+<div class="container">
+
+    <div id="formLogin">
+
+        <form>
+            <div class="form-group">
+                <label for="email">Email : </label>
+                <input type="email" class="form-control" id="email" aria-describedby="emailHelp"
+                    placeholder="Votre email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password :</label>
+                <input type="password" class="form-control" id="password" placeholder="Password">
+            </div>
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+
+            <a href="/register">S'inscrire</a>
+
+        </form>
+
+    </div>
+
+    <div id="logged" style="display:none">
+        <button id="decoBtn">Déconnexion</button>
+
+        <button id="display-token">Voir le token</button>
+        <div id="decoded"> </div>
+
+        <a href="#" id="user-only">Accés au Dashboard</a>
+
+    </div>
+
+</div>
+
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script><!-- axios permet de faire des requêtes plus courtes que xhr-->
+
+
+
+<% include ./partials/footer.ejs %>
+
+<script>
+    let form = document.querySelector('form');
+
+    let formLogin = document.getElementById('formLogin');
+    let logged = document.getElementById('logged');
+
+    let connectionLinkArea = document.querySelector('#connectionLink');
+
+    let btn = document.getElementById('decoBtn');
+    let decodeJwt = document.getElementById('display-token');
+    let user = document.querySelector('#user-only');
+
+
+
+    form.addEventListener("submit", loginUser);
+    user.addEventListener('click', makeRequestWithToken);
+    decodeJwt.addEventListener('click', decoded);
+    btn.addEventListener('click', disconnect);
+
+
+
+    function loginUser(event) {
+        loginUserWithXHR(event);
+    }
+
+
+    function loginUserWithXHR(event) {
+        event.preventDefault(); //stop le fonctionnement par défaut
+        console.log('login avec XHR'); // s'affichera dans la console du navigateur
+
+        let xhr = new XMLHttpRequest();
+        xhr.open("POST", '/login', true); // pour dire qu'on est asynchrone
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhr.onreadystatechange = function () { // c'est ici qu'on récupère le token
+            if (xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200) { // on vérifie que le statut du booléan (readyState = 1) est fini/ok (.DONE = 1) et que le statut de la requête est ok (statut = 200)
+                let token = xhr.response;
+                localStorage.setItem('token', token); // avec les deux lignes on a stocké en local.
+
+                switchToLogged(); // si tout ok, cela affiche le mode logged
+
+                form.reset();
+            }
+        }
+
+        let email = document.getElementById('email').value;
+        let password = document.getElementById('password').value;
+        let payload = "email=" + email + "&password=" + password;
+
+        xhr.send(payload); //c'est les données du jwt
+    }
+
+
+    function switchToForm() {
+        connectionLinkArea.innerHTML = '<a class="nav-item nav-link" id="decoUrl" href="/login">Connexion</a>';
+        formLogin.style.display = "block";
+        logged.style.display = "none";
+    }
+
+
+    function switchToLogged() {
+        connectionLinkArea.innerHTML = '<a class="nav-item nav-link" id="decoUrl" href="/login">Déconnexion</a>';
+        formLogin.style.display = "none";
+        logged.style.display = "block";
+    }
+
+
+    function disconnect() {
+        switchToForm();
+        localStorage.removeItem('token');
+    }
+
+
+    function parseJwt() {
+        // on stocke notre token local dan sla variable
+        let tokenStorage = localStorage.getItem('token');
+
+        //si j'ai un token
+        if (tokenStorage) {
+            // a chaque fois que je croise un point, je stock la donnée dans un tableau
+            let dataFromJwt = tokenStorage.split('.')[1]; //permet de couper au niveau du point
+
+            // je retourne la data sous forme d'un json après le décryptage
+            return JSON.parse(atob(dataFromJwt));
+        } else {
+            return 'aucun token a parser';
+        }
+    }
+
+
+    function decoded() {
+        let tokenJwt = parseJwt(); // on récupère le token décodé
+        let token = document.getElementById('decoded');
+
+        token.innerHTML = '<pre>' + JSON.stringify(tokenJwt) + '</pre>';
+    }
+
+
+    function makeRequestWithToken(evt) {
+        evt.preventDefault();
+
+        let page = this.id; // fait référence à id 'user-only' de l'élément html de l'évènement click
+        let tokenStorage = localStorage.getItem('token'); // on récupère le token sous forme json
+        let config = {}; // on crée un objet 
+
+        if (tokenStorage) {
+            //on peuple le header avec une autorization et le JSON.parse
+            config.headers = { 'Authorization': 'Bearer ' + JSON.parse(tokenStorage) } // si on a un token, le parse enlève les cotes pour transformer le json en javascript
+        } // ATTENTION l'espace après le Bearer est très IMPORTANT TOUT comme le Authorization et le Bearer qui doivent bien s'écrire comme ça
+
+        console.log(config);
+
+        axios.get(
+            'http://localhost:3000/' + page,
+            config
+        ).then(res => {
+            console.log('Success');
+            console.log(res);
+        }).catch(err => {
+            console.error('err', err);
+        })
+
+    }
+
+
+</script>
+

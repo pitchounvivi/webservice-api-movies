@@ -1,0 +1,106 @@
+<% include ./partials/header.ejs %>
+
+<div class="container mt-4">
+    <br><br><br>
+    <h1>Votre recherche sur <strong>Movie DB</strong></h1>
+    <br><br>
+
+    <div class="central">
+        <input type="text" class="form-control" name="term" id="term" placeholder="Veuillez saisir un titre de film">
+        <button class="btn btn-primary mt-4 mb-4" id="search">Rechercher</button>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-around" id="result">
+
+    </div>
+</div>
+
+
+<!-- tout ce qui suit permet de consommer un API -->
+
+
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script> <!-- pour consommer des API sur cette page -->
+
+<script>
+    const API_KEY = 'a645bfd58d860cda0acb46b25f762c65'; //la clé d'API
+
+    const term = document.querySelector('#term'); // revient à faire getElementById('term')
+    const btn = document.querySelector('#search'); // pour récupéer le bouton
+    btn.addEventListener('click', search); // on récupère l'évènement clic et on exécute la fonction
+
+    let resultDiv = document.querySelector('#result');
+    function search() {
+        // on récupère notre url
+        const query = `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${term.value}&language=fr-FR`; //la recherche dépendra de la valeur saisie dans la recherche
+
+        // on déclenche une fonction qui nous affichera le résultat
+        // axios se charge de faire l'envoi
+        axios.get(query).then( //on ping l'API
+            function (res) {
+                // on affiche le résultat en console.log
+                console.log(res.data.results[0]['title']); //pour avoir le titre de la première valeur
+                console.log(res.data.results[0]['overview']); // idem pour avoir la propriété overview / description
+
+                //je déclenche la fonction d'affichage
+                displayResultat(res.data.results);
+            })
+
+            //je récupère l'erreur
+            .catch((err) => {
+                //j'affiche l'erreur en console
+                console.log(err);
+            });
+    }
+
+    function displayResultat(results) {
+        resultDiv.innerHTML = ''; //on commence par vider le contenu au cas où il y aurait déjà des données.
+
+        for (let result of results) {
+
+            let divCard = document.createElement('div');
+            let divBody = document.createElement('div');
+            let imgCard = document.createElement('img');
+
+            let h5Card = document.createElement('h5');
+            let pCard = document.createElement('p');
+            let aCard = document.createElement('a');
+
+
+            divCard.classList.add('card', 'mb-3');
+            divBody.classList.add('card-body');
+            imgCard.classList.add('card-img-top');
+
+            h5Card.classList.add('card-title');
+            pCard.classList.add('card-text');
+            aCard.classList.add('btn', 'btn-primary', 'mb-2');
+
+
+            let value = 500;
+
+            h5Card.innerHTML = result.title + ' (' + result.release_date + ')';
+            pCard.innerHTML = result.overview;
+            aCard.innerText = 'Découvrir le film';
+
+            imgCard.setAttribute('src', 'https://image.tmdb.org/t/p/w' + value + result.backdrop_path); // avoir sur le site pour le chemin de l'API et avec postman pour avoir la propriété
+            divCard.style.width = "13rem";
+            pCard.style.maxHeight = "150px";
+            pCard.style.overflow = 'auto';
+            aCard.style.margin = 'auto';
+
+
+            divBody.appendChild(h5Card);
+            divBody.appendChild(pCard);
+
+            divCard.appendChild(imgCard);
+            divCard.appendChild(divBody);
+            divCard.appendChild(aCard);
+
+            resultDiv.appendChild(divCard);
+        }
+    }
+
+</script>
+
+<% include ./partials/footer.ejs %>
